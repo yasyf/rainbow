@@ -1,0 +1,27 @@
+import datetime
+from abc import ABCMeta, abstractmethod
+
+class Event(metaclass=ABCMeta):
+    def __init__(self, title: str, description: str, website: str, date: datetime.date):
+        self.title = title
+        self.description = description
+        self.website = website
+        self.date = date
+        try:
+            self.check_assertions()
+        except AssertionError as e:
+            raise EventError(e.args[0]) from e
+
+    @abstractmethod
+    def check_assertions(self):
+        pass
+
+    @abstractmethod
+    def is_on_date(self, date: datetime.date) -> bool:
+        return False
+
+    def is_on_day_of_month(self, day: int, month: int) -> bool:
+        return self.is_on_date(datetime.date.today().replace(day=day, month=month))
+
+class EventError(RuntimeError):
+    pass
