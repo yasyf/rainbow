@@ -1,16 +1,23 @@
 import datetime
 from .event import Event
-from ...enums.month import Month
 
 class OneTimeEvent(Event):
-    def __init__(self, day: int, month: Month, **kwargs):
-        self.day = day
-        self.month = month
+    def __init__(self, date: datetime.date = None, **kwargs):
+        kwargs['start_date'] = date
         super().__init__(**kwargs)
 
     def check_assertions(self):
-        assert 1 <= self.day <= 31, "invalid day"
-        assert 1 <= self.month <= 12, "invalid month"
+        super().check_assertions()
+
+    @property
+    def date(self):
+        return self.start_date
+
+    @date.setter
+    def date(self, date):
+        self.start_date = date
 
     def is_on_date(self, date: datetime.date) -> bool:
-        return date.day == self.day and date.month == self.month
+        if not super().is_on_date(date):
+            return False
+        return date == self.date
