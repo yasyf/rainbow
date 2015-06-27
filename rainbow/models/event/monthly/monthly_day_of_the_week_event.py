@@ -5,11 +5,13 @@ from rainbow.models.event import MonthlyEvent
 
 
 class MonthlyDayOfTheWeekEvent(MonthlyEvent):
-    def __int__(self, day_of_the_week: DayOfTheWeek, week: int):
+    def __init__(self, day_of_the_week: DayOfTheWeek = None, week: int = None, **kwargs):
         self.day_of_the_week = day_of_the_week
         self.week = week
+        super().__init__(**kwargs)
 
     def check_assertions(self):
+        super().check_assertions()
         assert 0 <= self.day_of_the_week <= 6, "invalid DayOfTheWeek"
         assert 1 <= self.week <= 5, "invalid week"
 
