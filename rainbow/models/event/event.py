@@ -17,6 +17,14 @@ class Event(object, metaclass=ABCMeta):
         except AssertionError as e:
             raise EventError(e.args[0]) from e
 
+    @property
+    def lattitude(self):
+        return None
+
+    @property
+    def longitude(self):
+        return None
+
     @abstractmethod
     def check_assertions(self):
         assert self.title is not None
