@@ -18,7 +18,7 @@ class Event(object, metaclass=ABCMeta):
             raise EventError(e.args[0]) from e
 
     @property
-    def lattitude(self):
+    def latitude(self):
         return None
 
     @property
