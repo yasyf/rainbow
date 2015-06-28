@@ -1,88 +1,68 @@
 import nltk
 from rainbow.models.event import OneTimeEvent
+from rainbow.parser.process import *
 import datetime
+from recurrent import RecurringEvent
 
-lemmatizer = nltk.WordNetLemmatizer()
-stemmer = nltk.stem.porter.PorterStemmer()
+class Parser(object):
+    def __init__(self):
+        self.date_pattern = """
+            DATE:{<MONTH><CD><,>*<CD>|<CD><SLASH><CD>(<SLASH><CD>)*|<CD|JJ><OF><MONTH>}
+        """
+        self.title_pattern = """
+            NP: {<PP\$>?<JJ.*>*<NN.*>+}
+        """
+        self.date_chunker = nltk.RegexpParser(self.date_pattern)
+        self.title_chunker = nltk.RegexpParser(self.title_pattern)
 
-sentence = "Graylock Event in San Mateo: June 21, 2015"
+    def parse(self,text):
+        events = [s.strip() for s in text.strip().splitlines()]
+        parsed_events = []
+        for event in events:
+            if event:
+                try:
+                    # attempt to match our title grammar
+                    np_tagged = process(event, self.title_chunker)
+                    noun_phrase = next(self.get_terms(np_tagged, "NP"))
+                    formatted_title = self.sanitize(' '.join(noun_phrase))
+                    try:
+                        # attempt to match our date grammar
+                        date_tagged = process(event, self.date_chunker)
+                        date = next(self.get_terms(date_tagged, "DATE"))
+                        formatted_date = one_time_process(date)
+                        parsed_events.append(OneTimeEvent(date=formatted_date, title=formatted_title))
+                    except StopIteration:
+                        #no date found, checking recurrent
+                        if contains_date(event):
+                            if is_recurring(event):
+                                try:
+                                    recurring_params = recurrent_parse(event)
+                                    parsed_events.append(recurrent_process(recurring_params, formatted_title))
+                                except:
+                                    continue
+                            else:
+                                formatted_date = non_recurrent_parse(event)
+                                parsed_events.append(OneTimeEvent(date=formatted_date, title=formatted_title))
+                        else:
+                            # no date found, skip to next event
+                            continue
+                except StopIteration:
+                    # no title found, skip to next event
+                    continue
 
-oneTimeEventPattern = """
-        DATE:{<NNP><CD><,><CD>}
-        NBAR:
-            {<NN.*|JJ>*<NN.*>}
-
-        NP:
-            {<NBAR >}
-
-
-    """
-
-oneTimeEventChunker = nltk.RegexpParser(oneTimeEventPattern)
-
-def parse(text):
-    events = [s.strip() for s in text.splitlines()]
-    parsed_events = []
-    for event in events:
-        formatted_sentence = format(event)
-        noun_phrases = list(get_terms(formatted_sentence, "NP"))
-        date = list(get_terms(formatted_sentence, "DATE"))
-        date = list(date[0])
-        noun_phrase = list(noun_phrases[0])
-        formatted_date = datetime.datetime.strptime(' '.join(date),"%B %d , %Y")
-        formatted_title = ' '.join(noun_phrase)
-        parsed_events.append(OneTimeEvent(date=formatted_date, title=formatted_title))
-    return parsed_events
-
-
-def format(sentence):
-    tokens = nltk.word_tokenize(sentence)
-    tagged = nltk.pos_tag(tokens)
-    result = oneTimeEventChunker.parse(tagged)
-    return result
-
-
-def leaves(tree, label):
-    """Finds NP (nounphrase) leaf nodes of a chunk tree."""
-    for subtree in tree.subtrees(filter = lambda t: t.label()==label):
-        yield subtree.leaves()
-
-
-def get_terms(tree, label):
-    for leaf in leaves(tree, label):
-        term = [ normalise(word) for word, tag in leaf
-            if acceptable_word(word) ]
-        yield term
+        return parsed_events
 
 
-
-def normalise(word):
-    """Normalises words to lowercase and stems and lemmatizes it."""
-    #word = word.lower()
-    #word = stemmer.stem_word(word)
-    #word = lemmatizer.lemmatize(word)
-    return word
+    def leaves(self, tree, label):
+        """Finds NP (nounphrase) leaf nodes of a chunk tree."""
+        for subtree in tree.subtrees(filter = lambda t: t.label() == label):
+            yield subtree.leaves()
 
 
-def acceptable_word(word):
-    """Checks conditions for acceptable word: length, stopword."""
-    return True
-    #from nltk.corpus import stopwords
-    #stopwords = stopwords.words('english')
+    def get_terms(self, tree, label):
+        for leaf in self.leaves(tree, label):
+            term = [ word for word, tag in leaf]
+            yield term
 
-    #accepted = bool(2 <= len(word) <= 40
-    #    and word.lower() not in stopwords)
-    #return accepted
-
-# nps = get_terms(result,"NP")
-# print("NP:\n")
-# for term in nps:
-#         for word in term:
-#            print(word)
-#         print()
-#
-# dates = get_terms(result,"DATE")
-# print("DATES:\n")
-# for term in dates:
-#         for word in term:
-#            print(word)
+    def sanitize(self, dirty_string):
+        return dirty_string.strip()

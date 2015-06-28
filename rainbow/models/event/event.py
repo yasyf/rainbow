@@ -7,7 +7,7 @@ from rainbow.helpers.mongo import geocache
 class Event(object, metaclass=ABCMeta):
     def __init__(self, group_id: uuid.UUID=None, title: str=None, description: str=None,
                 location: str=None, website: str=None, start_date: datetime.date=None,
-                end_date: datetime.date=None, start_time: datetime.time=None,
+                end_date: datetime.date= None, start_time: datetime.time=None,
                 end_time: datetime.time=None, **kwargs):
         self.group_id = group_id or uuid.uuid4()
         self.title = title
