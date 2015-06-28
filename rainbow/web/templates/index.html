@@ -2,20 +2,22 @@
 {% block title %}Rainbow{% endblock %}
 {% block body %}
   {% raw %}
-    <div ng-controller='IndexCtrl'>
-      <form role="form">
-        <div class="form-group">
-          <label for="doc">Google Doc Link</label>
-          <input type="text" name='doc' class="form-control" ng-model='data.docURL'
-                 placeholder="https://docs.google.com/document/d/1v0O9oDsc7fg1bEoBzwwS80EzNon3-Isk9aQ_16YgI-Q">
-          <input type="hidden" name="lat" ng-value="data.lat">
-          <input type="hidden" name="lng" ng-value="data.lng">
-        </div>
-      </form>
-      <div class="form-group">
-        <input type="text" ng-value="data.calendarURL" ng-if="data.calendarURL" class="form-control" readonly>
-      </div>
-      <pre ng-bind="data.events" ng-if="data.events"></pre>
+    <div class="container-fluid" ng-controller='IndexCtrl'>
+      <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+                <label for="docURL">Google Doc URL</label>
+                <input name='docURL' ng-model='data.docURL' type="text"
+                       placeholder="https://docs.google.com/document/d/1v0O9oDsc7fg1bEoBzwwS80EzNon3-Isk9aQ_16YgI-Q">
+                <label for="calendarURL" ng-if="data.calendarURL">Calender Subscription URL</label>
+                <input name="calendarURL" ng-value="data.calendarURL" ng-if="data.calendarURL" type="text" readonly>
+                <ul id="events-list" class="nav nav-sidebar"> </ul>
+            </div>
+            <div class="col-sm-9 col-md-10 main">
+              <div id="map-container" class="row">
+                <div id="map-canvas"></div>
+              </div>
+            </div>
+       </div>
     </div>
   {% endraw %}
 {% endblock %}
