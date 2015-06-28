@@ -48,7 +48,7 @@ def one_time_process(date):
     table = str.maketrans("", "", string.punctuation)
     date_string = ' '.join(date).translate(table)
     r = RecurringEvent(now_date=datetime.datetime.utcnow())
-    return(r.parse(date_string))
+    return r.parse(date_string)
 
 def contains_date(event):
     r = RecurringEvent(now_date=datetime.datetime.utcnow())
@@ -78,14 +78,13 @@ def recurrent_process(event, title):
         event = WeeklyEvent(day_of_the_week = DayOfTheWeek[params['byday']], skip_weeks = params['interval']-1, title = title)
     else:
         if 'byday' in params:
-            print(params['byday'])
             if len(params['byday']) == 3:
                 day = params['byday'][1:3]
                 week = int(params['byday'][0])
             else:
                 day = params['byday']
                 week = 1
-            event = MonthlyDayOfTheWeekEvent(skip_months = int(params['interval'])-1, day_of_the_week = DayOfTheWeek[day], week = int(params['byday'][0]), title = title)
+            event = MonthlyDayOfTheWeekEvent(skip_months = int(params['interval']) - 1, day_of_the_week=DayOfTheWeek[day], week=week, title =title)
         else:
-            event = MonthlyDayOfTheMonthEvent(skip_months = int(params['interval'])-1, date = int(params['bymonthday']), title = title)
+            event = MonthlyDayOfTheMonthEvent(skip_months = int(params['interval']) - 1, date=int(params['bymonthday']), title=title)
     return event
