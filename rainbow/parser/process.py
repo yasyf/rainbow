@@ -1,5 +1,6 @@
 import nltk
 import string
+import re
 from recurrent import RecurringEvent
 import datetime
 from rainbow.enums.day_of_the_week import DayOfTheWeek
@@ -140,6 +141,7 @@ model = {
 
 def process(sentence, chunker):
     sentence = sentence.replace('/', ' / ')
+    sentence = re.sub('(\d+(rd|th|nd|st)?) of', r"\1", sentence)
     tokens = nltk.word_tokenize(sentence)
     default_tagger = nltk.data.load(nltk.tag._POS_TAGGER)
     tagger = nltk.tag.UnigramTagger(model=model, backoff=default_tagger)
