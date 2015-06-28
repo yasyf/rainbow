@@ -85,7 +85,7 @@ FlaskStart.controller 'IndexCtrl', ['$scope', '$timeout', ($scope, $timeout) ->
         pollForEvents(response.id)
       .progress (id, events) ->
         $timeout ->
-          $scope.data.events = events
+          $scope.data.events = _.uniq events, 'group_id'
           $scope.data.calendarURL = "https://#{document.location.host}/api/calendar/#{id}.ics"
 
 ]
