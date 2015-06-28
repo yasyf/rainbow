@@ -37,7 +37,6 @@ def process(sentence, one_time_event_chunker):
     default_tagger = nltk.data.load(nltk.tag._POS_TAGGER)
     tagger = nltk.tag.UnigramTagger(model=model, backoff=default_tagger)
     tagged = tagger.tag(tokens)
-    print(tagged)
     result = one_time_event_chunker.parse(tagged)
     return result
 
