@@ -1,6 +1,8 @@
 __author__ = 'danielzuo'
 
 import nltk
+from rainbow.models.event import OneTimeEvent
+import datetime
 
 lemmatizer = nltk.WordNetLemmatizer()
 stemmer = nltk.stem.porter.PorterStemmer()
@@ -21,11 +23,27 @@ datePattern = """
 DateChunker = nltk.RegexpParser(datePattern)
 TitleChunker = nltk.RegexpParser(titlePattern)
 
-tokens = nltk.word_tokenize(sentence)
-tagged = nltk.pos_tag(tokens)
-result = DateChunker.parse(tagged)
-result = TitleChunker.parse(result)
+def parse(text):
+    events = [s.strip() for s in text.splitlines()]
+    for event in events:
+        formatted_sentence = format(event)
+        noun_phrases = list(get_terms(formatted_sentence, "NP"))
+        date = list(get_terms(formatted_sentence, "DATE"))
+        date = list(date[0])
+        noun_phrase = list(noun_phrases[0])
+        print("date", date)
+        print(noun_phrase)
+        formatted_date = datetime.datetime.strptime(' '.join(date),"%B %d %Y")
+        formatted_title = ' '.join(noun_phrase)
+        return OneTimeEvent(date=formatted_date, title=formatted_title)
 
+
+def format(sentence):
+    tokens = nltk.word_tokenize(sentence)
+    tagged = nltk.pos_tag(tokens)
+    result = DateChunker.parse(tagged)
+    result = TitleChunker.parse(result)
+    return result
 
 def leaves(tree, label):
     """Finds NP (nounphrase) leaf nodes of a chunk tree."""
@@ -56,15 +74,17 @@ def acceptable_word(word):
         and word.lower() not in stopwords)
     return accepted
 
-nps = get_terms(result,"NP")
-print("NP:\n")
-for term in nps:
-        for word in term:
-           print(word)
-        print()
+# nps = get_terms(result,"NP")
+# print("NP:\n")
+# for term in nps:
+#         for word in term:
+#            print(word)
+#         print()
+#
+# dates = get_terms(result,"DATE")
+# print("DATES:\n")
+# for term in dates:
+#         for word in term:
+#            print(word)
 
-dates = get_terms(result,"DATE")
-print("DATES:\n")
-for term in dates:
-        for word in term:
-           print(word)
+parse(sentence)
