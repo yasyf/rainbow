@@ -1,6 +1,7 @@
 import datetime, uuid
 from abc import ABCMeta, abstractmethod
 import icalendar
+from rainbow.helpers.meta import get_url_and_description
 from rainbow.helpers.mongo import geocache
 
 
@@ -18,10 +19,14 @@ class Event(object, metaclass=ABCMeta):
         self.location = location
         self.start_time = start_time
         self.end_time = end_time
+
+        if not self.description or not self.website:
+            self.website, self.description = get_url_and_description(self)
+
         try:
             self.check_assertions()
         except AssertionError as e:
-            raise EventError(e.args[0]) from e
+            raise EventError(e.args[0] if e.args else e) from e
 
     @property
     def latitude(self) -> float:
