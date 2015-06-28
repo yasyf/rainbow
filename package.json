@@ -1,0 +1,15 @@
+{
+  "name": "rainbow",
+  "version": "1.0.0",
+  "homepage": "https://github.com/yasyf/rainbow",
+  "authors": [
+    "Yasyf Mohamedali",
+    "Michael Shum",
+    "Daniel Zuo",
+    "Benjamin Lin"
+  ],
+  "dependencies": {
+    "coffee-script": "~1.7.1",
+    "less": "^1.7.3"
+  }
+}

@@ -16,3 +16,14 @@ class Calendar(object):
         list(map(cal.add_component, map(Event.to_ical, self.events)))
         return cal.to_ical()
 
+    def to_dict(self):
+        return {
+            'events': list(map(Event.to_dict, self.events))
+        }
+
+    @classmethod
+    def find(cls, id):
+        if id == 'demo':
+            return CalendarFixture.get()
+
+from rainbow.fixtures.calendar_fixture import CalendarFixture
