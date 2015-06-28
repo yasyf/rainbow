@@ -6,7 +6,7 @@ import datetime
 class Parser():
     def __init__(self):
         self.oneTimeEventPattern = """
-            DATE:{<NNP><CD><,><CD>}
+            DATE:{<MONTH><CD><,>*<CD>|<CD><SLASH><CD>(<SLASH><CD>)* }
             NBAR:
                 {<NN.*|JJ>*<NN.*>}
 
@@ -26,13 +26,13 @@ class Parser():
         events = [s.strip() for s in text.splitlines()]
         parsed_events = []
         for event in events:
-            #formatted_sentence = format(event)
             formatted_sentence = process(event, self.oneTimeEventChunker)
             noun_phrases = list(self.get_terms(formatted_sentence, "NP"))
             date = list(self.get_terms(formatted_sentence, "DATE"))
             date = list(date[0])
             noun_phrase = list(noun_phrases[0])
-            formatted_date = datetime.datetime.strptime(' '.join(date),"%B %d , %Y")
+            processed_date = date_process(date)
+            formatted_date = datetime.datetime.strptime(' '.join(processed_date),"%B %d %Y")
             formatted_title = ' '.join(noun_phrase)
             parsed_events.append(OneTimeEvent(date=formatted_date, title=formatted_title).to_dict())
         return parsed_events
