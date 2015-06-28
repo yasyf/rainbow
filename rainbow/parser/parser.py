@@ -37,14 +37,16 @@ class Parser():
                             if is_recurring(event):
                                 try:
                                     recurring_params = recurrent_parse(event)
-                                    parsed_events.append(recurrent_process(recurring_params, formatted_title))
+                                    parsed_events.extend(recurrent_process(recurring_params, formatted_title))
                                 except:
+                                    print("exception")
                                     continue
                             else:
                                 formatted_date = non_recurrent_parse(event)
-                                parsed_events.append(OneTimeEvent(date=formatted_date, title=formatted_title))
+                                parsed_events.extend(OneTimeEvent(date=formatted_date, title=formatted_title))
                         else:
                             # no date found, skip to next event
+                            print('skip')
                             continue
                 except StopIteration:
                     # no title found, skip to next event
