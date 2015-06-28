@@ -119,16 +119,20 @@ def non_recurrent_parse(event):
 def recurrent_parse(event):
     r = RecurringEvent(now_date=datetime.datetime.utcnow())
     r.parse(event)
-    return r
+    start_time, success = parse_time(event)
+    if success:
+        return r, {'start_time':start_time}
+    else:
+        return r, {}
 
-def recurrent_process(event, title):
+def recurrent_process(event, title, extra):
     events = []
     params = event.get_params()
     if params['freq'] == 'weekly':
         days = params['byday'].split(',')
         group = uuid.uuid4()
         for day in days:
-            events.append(WeeklyEvent(group_id=group, day_of_the_week = DayOfTheWeek[day], skip_weeks=params['interval'] - 1, title=title))
+            events.append(WeeklyEvent(group_id=group, day_of_the_week = DayOfTheWeek[day], skip_weeks=params['interval'] - 1, title=title, start_time=extra.get('start_time')))
     else:
         if 'byday' in params:
             if len(params['byday']) == 3:
@@ -137,7 +141,13 @@ def recurrent_process(event, title):
             else:
                 day = params['byday']
                 week = 1
-            events.append(MonthlyDayOfTheWeekEvent(skip_months=int(params['interval']) - 1, day_of_the_week=DayOfTheWeek[day], week=week, title=title))
+            events.append(MonthlyDayOfTheWeekEvent(skip_months=int(params['interval']) - 1, day_of_the_week=DayOfTheWeek[day], week=week, title=title, start_time=start_time))
         else:
-            events.append(MonthlyDayOfTheMonthEvent(skip_months=int(params['interval']) - 1, date=int(params['bymonthday']), title=title))
+            events.append(MonthlyDayOfTheMonthEvent(skip_months=int(params['interval']) - 1, date=int(params['bymonthday']), title=title, start_time=start_time))
     return events
+
+def parse_time(event):
+    dt = datetime.datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+    r = RecurringEvent(now_date=dt)
+    start_date, success = r.parse_time(event, dt)
+    return start_date.time(), success

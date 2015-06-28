@@ -27,24 +27,29 @@ class Parser(object):
                         date_tagged = process(event, self.date_chunker)
                         date = next(self.get_terms(date_tagged, "DATE"))
                         formatted_date = one_time_process(date)
-                        parsed_events.append(OneTimeEvent(date=formatted_date, title=formatted_title))
+                        if formatted_date.time():
+                            parsed_events.append(OneTimeEvent(date=formatted_date, title=formatted_title, start_time=formatted_date.time()))
+                        else:
+                            parsed_events.append(OneTimeEvent(date=formatted_date, title=formatted_title))
                     except StopIteration:
                         # no date found, checking recurrent
                         if contains_date(event):
                             if is_recurring(event):
                                 try:
-                                    recurring_params = recurrent_parse(event)
-                                    parsed_events.extend(recurrent_process(recurring_params, formatted_title))
+                                    recurring_params, extra_params = recurrent_parse(event)
+                                    parsed_events.extend(recurrent_process(recurring_params, formatted_title, extra_params))
                                 except:
                                     import traceback
                                     traceback.print_exc()
                                     continue
                             else:
                                 formatted_date = non_recurrent_parse(event)
-                                parsed_events.append(OneTimeEvent(date=formatted_date, title=formatted_title))
+                                if formatted_date.time():
+                                    parsed_events.append(OneTimeEvent(date=formatted_date, title=formatted_title, start_time=formatted_date.time()))
+                                else:
+                                    parsed_events.append(OneTimeEvent(date=formatted_date, title=formatted_title))
                         else:
                             # no date found, skip to next event
-                            print('skip')
                             continue
                 except StopIteration:
                     # no title found, skip to next event

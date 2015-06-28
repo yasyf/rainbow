@@ -1,5 +1,6 @@
 import unittest, datetime
 from rainbow.models.event.monthly.monthly_day_of_the_week_event import MonthlyDayOfTheWeekEvent
+from rainbow.models.event.weekly_event import WeeklyEvent
 from rainbow.models.event.one_time_event import OneTimeEvent
 from rainbow.parser.parser import Parser
 
@@ -36,6 +37,13 @@ August 23 : The Giant Race Half Marathon"""
         self.assertIsInstance(parsed, list)
         for i in range(len(trial.split('\n'))-1):
             self.assertIsInstance(parsed[i], OneTimeEvent)
+
+    def test_times(self):
+        trial = """every Friday at 4pm: SF Design Week"""
+        p = Parser()
+        parsed = p.parse(trial)
+        self.assertIsInstance(parsed[0],WeeklyEvent)
+        self.assertEquals(parsed[0].to_dict()['start'].time(),datetime.time(16))
 
 if __name__ == '__main__':
     unittest.main()
