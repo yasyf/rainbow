@@ -20,7 +20,7 @@ class Parser():
             TEST:{<CD><SLASH><CD>}
             """
 
-        self.oneTimeEventChunker = nltk.RegexpParser(self.testPattern)
+        self.oneTimeEventChunker = nltk.RegexpParser(self.oneTimeEventPattern)
 
     def parse(self,text):
         events = [s.strip() for s in text.splitlines()]
@@ -36,15 +36,6 @@ class Parser():
             formatted_title = ' '.join(noun_phrase)
             parsed_events.append(OneTimeEvent(date=formatted_date, title=formatted_title).to_dict())
         return parsed_events
-
-
-    def format(self, sentence):
-        tokens = nltk.word_tokenize(sentence)
-        tagged = nltk.pos_tag(tokens)
-        tagged = [(x, "SLASH") if x == '/' else (x, y) for (x, y) in tagged]
-        result = self.oneTimeEventChunker.parse(tagged)
-        #result.draw()
-        return result
 
 
     def leaves(self, tree, label):

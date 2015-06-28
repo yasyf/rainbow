@@ -8,6 +8,3 @@ def process(sentence, one_time_event_chunker):
     #result.draw()
     print(result)
     return result
-
-def date_preprocess(sentence):
-    print()
