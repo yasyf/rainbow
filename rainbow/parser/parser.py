@@ -40,7 +40,7 @@ class Parser(object):
                                     continue
                             else:
                                 formatted_date = non_recurrent_parse(event)
-                                parsed_events.extend(OneTimeEvent(date=formatted_date, title=formatted_title))
+                                parsed_events.append(OneTimeEvent(date=formatted_date, title=formatted_title))
                         else:
                             # no date found, skip to next event
                             print('skip')
