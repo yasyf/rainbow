@@ -1,5 +1,6 @@
 from rainbow.models.event import OneTimeEvent
 from rainbow.parser.process import *
+import string
 
 class Parser(object):
     def __init__(self):
@@ -22,6 +23,8 @@ class Parser(object):
                     np_tagged = process(event, self.title_chunker)
                     noun_phrase = next(self.get_terms(np_tagged, "NP"))
                     formatted_title = self.sanitize(' '.join(noun_phrase))
+                    table = str.maketrans("", "", string.punctuation)
+                    formatted_title = ''.join(formatted_title).translate(table)
                     try:
                         # attempt to match our date grammar
                         date_tagged = process(event, self.date_chunker)
