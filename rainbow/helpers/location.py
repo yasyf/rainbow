@@ -6,7 +6,7 @@ def cache_geolocation_info_for_event(event, lat, lng):
     cached = geocache.find_one({'original_name': event.title})
 
     if cached:
-        lat, lng, name = [cached.get(x) for x in ['lat, lng, location']]
+        lat, lng, name = cached['lat'], cached['lng'], cached['location']
     else:
         api_root = "https://maps.googleapis.com/maps/api/place/textsearch/json"
         url_template = api_root + "?query={q}&key={k}&location={l}&radius={r}"

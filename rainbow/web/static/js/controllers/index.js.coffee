@@ -30,8 +30,8 @@ FlaskStart.controller 'IndexCtrl', ['$scope', '$timeout', ($scope, $timeout) ->
       .then (response) ->
         pollForEvents(response.id)
       .then (id, events) ->
-        console.log events
         $timeout ->
+          $scope.data.events = JSON.stringify events, null, 2
           $scope.data.calendarURL = "https://#{document.location.host}/api/calendar/#{id}.vcs"
 
 ]
