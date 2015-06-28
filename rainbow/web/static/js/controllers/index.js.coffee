@@ -11,7 +11,8 @@ FlaskStart.controller 'IndexCtrl', ['$scope', '$timeout', ($scope, $timeout) ->
         lng: -122.343750
       zoom: 13
 
-  populateMap = (events) ->
+  populateMap = (events, oldEvents) ->
+    return if events is oldEvents or _.isEqual(events, oldEvents)
     return unless $scope.map?
 
     uuids = _.map events, 'group_id'
@@ -23,6 +24,8 @@ FlaskStart.controller 'IndexCtrl', ['$scope', '$timeout', ($scope, $timeout) ->
 
     _.each $scope.markers, (marker) ->
       marker.setMap(null)
+
+    $('li').remove()
 
     $scope.markers = _.map events, (event) ->
       marker = new google.maps.Marker
@@ -55,7 +58,7 @@ FlaskStart.controller 'IndexCtrl', ['$scope', '$timeout', ($scope, $timeout) ->
     $.get("/api/calendar/#{id}.json").then (response) ->
       if response.events.length > 0
         deferred.notify(id, response.events)
-        timeout = 30000
+        timeout = 60000
       else
         timeout = 500
 
