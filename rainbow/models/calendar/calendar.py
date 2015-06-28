@@ -1,5 +1,5 @@
+from operator import methodcaller
 import icalendar, pickle, bson
-from rainbow.models.event import Event
 from rainbow.helpers.mongo import calendars
 
 
@@ -16,11 +16,11 @@ class Calendar(object):
         cal.add('prodid', self.prodid)
         cal.add('version', self.VERSION)
         cal.add('summary', self.url)
-        list(map(cal.add_component, map(Event.to_ical, self.events)))
+        list(map(cal.add_component, map(methodcaller('to_ical'), self.events)))
         return cal.to_ical()
 
     def to_dict(self):
-        return {'events': list(map(Event.to_dict, self.events))}
+        return {'events': list(map(methodcaller('to_dict'), self.events))}
 
     @classmethod
     def _find_by_url(cls, url):
