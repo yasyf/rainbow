@@ -2,30 +2,46 @@ import nltk
 from rainbow.models.event import OneTimeEvent
 from rainbow.parser.process import *
 import datetime
+from recurrent import RecurringEvent
 
 class Parser():
     def __init__(self):
-        self.oneTimeEventPattern = """
-            DATE:{<MONTH><CD><,>*<CD>|<CD><SLASH><CD>(<SLASH><CD>)* }
+        self.date_pattern = """
+            DATE:{<MONTH><CD><,>*<CD>|<CD><SLASH><CD>(<SLASH><CD>)*|<CD|JJ><OF><MONTH>}
+        """
+        self.title_pattern = """
             NP: {<PP\$>?<JJ.*>*<NN.*>+}
         """
-
-        self.oneTimeEventChunker = nltk.RegexpParser(self.oneTimeEventPattern)
+        self.date_chunker = nltk.RegexpParser(self.date_pattern)
+        self.title_chunker = nltk.RegexpParser(self.title_pattern)
 
     def parse(self,text):
         events = [s.strip() for s in text.strip().splitlines()]
         parsed_events = []
         for event in events:
             if event:
-                formatted_sentence = process(event, self.oneTimeEventChunker)
                 try:
-                    noun_phrase = next(self.get_terms(formatted_sentence, "NP"))
-                    date = next(self.get_terms(formatted_sentence, "DATE"))
+                    # attempt to match our title grammar
+                    np_tagged = process(event, self.title_chunker)
+                    noun_phrase = next(self.get_terms(np_tagged, "NP"))
+                    formatted_title = ' '.join(noun_phrase)
+                    try:
+                        # attempt to match our date grammar
+                        date_tagged = process(event, self.date_chunker)
+                        date = next(self.get_terms(date_tagged, "DATE"))
+                        ## format date as a datetime by calling dateprocess()
+                        formatted_date = ""
+                        parsed_events.append(OneTimeEvent(date=formatted_date, title=formatted_title))
+                    except StopIteration:
+                        #no date found, checking recurrent
+                        
+                        formatted_date = datetime.datetime.strptime(' '.join(date),"%B %d %Y")
+                        formatted_title = ' '.join(noun_phrase)
+                        parsed_events.append(OneTimeEvent(date=formatted_date, title=formatted_title).to_dict())
                 except StopIteration:
+                    # no title found, skip to next event
                     continue
-                formatted_date = datetime.datetime.strptime(' '.join(date),"%B %d %Y")
-                formatted_title = ' '.join(noun_phrase)
-                parsed_events.append(OneTimeEvent(date=formatted_date, title=formatted_title).to_dict())
+
         return parsed_events
 
 

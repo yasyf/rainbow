@@ -28,13 +28,13 @@ model = {
     'december': 'MONTH',
 }
 
-def process(sentence, one_time_event_chunker):
+def process(sentence, chunker):
     sentence = sentence.replace('/', ' / ')
     tokens = nltk.word_tokenize(sentence)
     default_tagger = nltk.data.load(nltk.tag._POS_TAGGER)
     tagger = nltk.tag.UnigramTagger(model=model, backoff=default_tagger)
     tagged = tagger.tag(tokens)
-    result = one_time_event_chunker.parse(tagged)
+    result = chunker.parse(tagged)
     return result
 
 def date_process(date):
