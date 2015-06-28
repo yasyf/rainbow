@@ -1,5 +1,3 @@
-__author__ = 'danielzuo'
-
 import nltk
 from rainbow.models.event import OneTimeEvent
 import datetime
@@ -35,7 +33,7 @@ def parse(text):
         noun_phrase = list(noun_phrases[0])
         formatted_date = datetime.datetime.strptime(' '.join(date),"%B %d %Y")
         formatted_title = ' '.join(noun_phrase)
-        events.append(OneTimeEvent(date=formatted_date, title=formatted_title).to_dict())
+        parsed_events.append(OneTimeEvent(date=formatted_date, title=formatted_title).to_dict())
     return parsed_events
 
 
