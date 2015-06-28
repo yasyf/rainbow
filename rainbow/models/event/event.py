@@ -19,6 +19,7 @@ class Event(object, metaclass=ABCMeta):
         self.location = location
         self.start_time = start_time
         self.end_time = end_time
+        self.uid = uuid.uuid4()
 
         if not self.description or not self.website:
             self.website, self.description = get_url_and_description(self)
@@ -46,6 +47,7 @@ class Event(object, metaclass=ABCMeta):
 
     def to_dict(self):
         return {
+            'uid': self.uid,
             'group_id': self.group_id,
             'title': self.title,
             'description': self.description,
@@ -71,7 +73,7 @@ class Event(object, metaclass=ABCMeta):
 
     def to_ical(self) -> icalendar.Event:
         event = icalendar.Event()
-        event.add('uid', self.group_id)
+        event.add('uid', self.uid)
         event.add('summary', self.title)
         for field in ['description', 'location']:
             if getattr(self, field):
