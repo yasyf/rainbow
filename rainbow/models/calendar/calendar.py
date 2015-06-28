@@ -6,9 +6,11 @@ from rainbow.helpers.mongo import calendars
 class Calendar(object):
     VERSION = 1.0
 
-    def __init__(self, url, events):
+    def __init__(self, url: str, type: str, data: str, events):
         self.prodid = '-//{}//{}//'.format(self.__class__.__name__, self.__class__.__module__)
         self.url = url
+        self.type = type
+        self.data = data
         self.events = events
 
     def to_ical(self):
@@ -32,6 +34,8 @@ class Calendar(object):
 
     def _serialize(self):
         return {
+            'type': self.type,
+            'data': self.data,
             'url': self.url,
             'pickle': pickle.dumps(self)
         }
@@ -51,12 +55,16 @@ class Calendar(object):
             return pickle.loads(found['pickle'])
 
     @classmethod
+    def from_pickle(cls, picked):
+        return pickle.loads(picked)
+
+    @classmethod
     def from_url(cls, url):
         found = cls._find_by_url(url)
         if found:
-            return pickle.loads(found['pickle'])
+            return cls.from_pickle(found['pickle'])
         else:
-            return cls(url, [])
+            return cls(url, None, None, [])
 
     def save(self):
         found = self._find_by_url(self.url)
