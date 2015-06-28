@@ -1,5 +1,5 @@
 from multiprocessing import Pool
-import time
+import time, os
 from rainbow.helpers.location import cache_geolocation_info_for_event
 from rainbow.helpers.mongo import calendars
 from rainbow.importers import Importer
@@ -13,7 +13,7 @@ def monitor():
         for calendar_data in calendars.find({'data': {'$exists': True}}):
             calendar = Calendar.from_pickle(calendar_data['pickle'])
             Pooler.submit(parse_calendar, calendar.type, calendar.url, [None, None], calendar.data)
-        time.sleep(30)
+        time.sleep(int(os.getenv('MONITOR_DELAY') or 30))
 
 def parse_calendar(type_, file, user_geo, existing_data=None):
     print('Processing {}'.format(file))
