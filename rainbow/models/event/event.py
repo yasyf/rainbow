@@ -93,5 +93,8 @@ class Event(object, metaclass=ABCMeta):
     def is_on_day_of_month(self, day: int, month: int) -> bool:
         return self.is_on_date(datetime.date.today().replace(day=day, month=month))
 
+    def __repr__(self):
+        return repr(self.to_dict())
+
 class EventError(RuntimeError):
     pass
