@@ -1,12 +1,14 @@
 from flask import Flask
+from multiprocessing import Process
 from werkzeug.contrib.fixers import ProxyFix
 from flask.ext import assets
 import os, glob
+from rainbow import dev
+from rainbow.helpers.threads import monitor
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SK')
 app.wsgi_app = ProxyFix(app.wsgi_app)
-dev = os.environ.get('DEV') == 'true'
 
 env = assets.Environment(app)
 env.load_path = [os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir)]
@@ -42,4 +44,5 @@ env.register('css_all', assets.Bundle(*css, filters=css_filters, output='css/min
 from rainbow.web.routes import *
 
 if __name__ == '__main__':
+  Process(target=monitor).start()
   app.run(host='0.0.0.0', port=int(os.environ.get('PORT') or 5000), debug=dev)

@@ -13,8 +13,9 @@
         </div>
       </form>
       <div class="form-group">
-        <input type="text" ng-value="data.calendarURL" class="form-control" readonly>
+        <input type="text" ng-value="data.calendarURL" ng-if="data.calendarURL" class="form-control" readonly>
       </div>
+      <pre ng-bind="data.events" ng-if="data.events"></pre>
     </div>
   {% endraw %}
 {% endblock %}
