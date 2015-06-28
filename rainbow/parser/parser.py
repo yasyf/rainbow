@@ -4,7 +4,7 @@ from rainbow.parser.process import *
 import datetime
 from recurrent import RecurringEvent
 
-class Parser():
+class Parser(object):
     def __init__(self):
         self.date_pattern = """
             DATE:{<MONTH><CD><,>*<CD>|<CD><SLASH><CD>(<SLASH><CD>)*|<CD|JJ><OF><MONTH>}
@@ -55,7 +55,7 @@ class Parser():
 
     def leaves(self, tree, label):
         """Finds NP (nounphrase) leaf nodes of a chunk tree."""
-        for subtree in tree.subtrees(filter = lambda t: t.label()==label):
+        for subtree in tree.subtrees(filter = lambda t: t.label() == label):
             yield subtree.leaves()
 
 
