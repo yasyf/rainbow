@@ -1,5 +1,6 @@
 import nltk
 from rainbow.models.event import OneTimeEvent
+from rainbow.parser.process import *
 import datetime
 
 class Parser():
@@ -25,7 +26,8 @@ class Parser():
         events = [s.strip() for s in text.splitlines()]
         parsed_events = []
         for event in events:
-            formatted_sentence = format(event)
+            #formatted_sentence = format(event)
+            formatted_sentence = process(event, self.oneTimeEventChunker)
             noun_phrases = list(self.get_terms(formatted_sentence, "NP"))
             date = list(self.get_terms(formatted_sentence, "DATE"))
             date = list(date[0])
