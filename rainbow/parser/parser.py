@@ -4,7 +4,7 @@ from rainbow.parser.process import *
 class Parser(object):
     def __init__(self):
         self.date_pattern = """
-            DATE:{<MONTH><CD><,>*<CD>|<CD><SLASH><CD>(<SLASH><CD>)*|<CD|JJ><OF><MONTH>}
+            DATE:{<MONTH><CD><,>*<CD>|<CD><SLASH><CD>(<SLASH><CD>)*|<CD|JJ><MONTH>}
         """
         self.title_pattern = """
             NP: {<PP\$>?<JJ.*>*<NN.*>+}
