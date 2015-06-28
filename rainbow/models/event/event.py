@@ -1,6 +1,6 @@
 import datetime, uuid
 from abc import ABCMeta, abstractmethod
-import icalendar, dateutil.rrule
+import icalendar
 
 class Event(object, metaclass=ABCMeta):
     def __init__(self, group_id: uuid.UUID=None, title: str=None, description: str=None,

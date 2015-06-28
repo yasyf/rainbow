@@ -1,5 +1,6 @@
-from flask import render_template, Response, jsonify
+from flask import render_template, Response, jsonify, request
 from .app import app
+from rainbow.helpers.threading import Pooler, parse_calendar
 from rainbow.models.calendar.calendar import Calendar
 
 
@@ -15,12 +16,19 @@ def postprocess_request(response):
 def index_view():
   return render_template('index.html')
 
-@app.route('/calendar/<id>.vcs')
-def ics_calendar_view(id):
-    calendar = Calendar.find(id)
+@app.route('/api/calendar', methods=['POST'])
+def api_create_view():
+    calendar = Calendar.from_url(request.form['url'])
+    _id = calendar.save()
+    Pooler.submit(parse_calendar, request.form['type'], request.form['url'])
+    return jsonify({'status': 'success', 'id': str(_id)})
+
+@app.route('/api/calendar/<_id>.vcs')
+def ics_calendar_view(_id):
+    calendar = Calendar.find(_id)
     return Response(calendar.to_ical(), mimetype='text/calendar')
 
-@app.route('/calendar/<id>.json')
-def json_calendar_view(id):
-    calendar = Calendar.find(id)
+@app.route('/api/calendar/<_id>.json')
+def json_calendar_view(_id):
+    calendar = Calendar.find(_id)
     return jsonify(calendar.to_dict())

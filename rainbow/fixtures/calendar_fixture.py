@@ -18,6 +18,6 @@ class CalendarFixture(object):
                         day_of_the_week=DayOfTheWeek.monday, skip_weeks=0)
 
         ]
-        return Calendar(events)
+        return Calendar('demo', events)
 
 from rainbow.models.calendar.calendar import Calendar
