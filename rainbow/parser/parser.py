@@ -1,8 +1,5 @@
-import nltk
 from rainbow.models.event import OneTimeEvent
 from rainbow.parser.process import *
-import datetime
-from recurrent import RecurringEvent
 
 class Parser(object):
     def __init__(self):
@@ -32,7 +29,7 @@ class Parser(object):
                         formatted_date = one_time_process(date)
                         parsed_events.append(OneTimeEvent(date=formatted_date, title=formatted_title))
                     except StopIteration:
-                        #no date found, checking recurrent
+                        # no date found, checking recurrent
                         if contains_date(event):
                             if is_recurring(event):
                                 try:
@@ -61,7 +58,7 @@ class Parser(object):
 
     def get_terms(self, tree, label):
         for leaf in self.leaves(tree, label):
-            term = [ word for word, tag in leaf]
+            term = [word for word, tag in leaf]
             yield term
 
     def sanitize(self, dirty_string):

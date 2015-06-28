@@ -81,6 +81,10 @@ class Event(object, metaclass=ABCMeta):
 
     @abstractmethod
     def check_assertions(self):
+        if isinstance(self.start_date, datetime.datetime):
+            self.start_date = self.start_date.date()
+        if isinstance(self.end_date, datetime.datetime):
+            self.end_date = self.end_date.date()
         assert self.title is not None
         assert isinstance(self.group_id, uuid.UUID)
         assert isinstance(self.start_date, datetime.date)
