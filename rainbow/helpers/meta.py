@@ -3,7 +3,7 @@ from html.parser import HTMLParser
 
 def get_website(event):
     query = event.title.replace(' ', '+')
-    url = "http://ajax.googleapis.com/ajax/services/search/web?v=1.0&rsz=large&q=%s&start=%s" % (query, str(0))
+    url = "http://ajax.googleapis.com/ajax/services/search/web?v=1.0&q=%s" % query
     result = urllib.request.urlopen(url).read()
     json_data = json.loads(result.decode("utf-8"))
     return json_data['responseData']['results'][0]['unescapedUrl']
@@ -28,3 +28,5 @@ class GetDescriptionHTMLParser(HTMLParser):
                 if k == 'name' and v == 'description':
                     self.description = content
                     break
+
+get_description(E())
