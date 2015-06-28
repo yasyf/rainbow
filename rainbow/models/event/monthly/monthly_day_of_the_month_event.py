@@ -1,4 +1,5 @@
 import datetime
+import icalendar
 from rainbow.models.event import MonthlyEvent
 
 
@@ -16,3 +17,6 @@ class MonthlyDayOfTheMonthEvent(MonthlyEvent):
             return False
         return date.day == self.date
 
+    def rrule(self):
+        return icalendar.vRecur(freq='MONTHLY', interval=self.skip_months + 1,
+                                bymonthday=self.date)

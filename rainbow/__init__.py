@@ -1,1 +1,3 @@
-__author__ = 'yasyf'
+from .helpers import monkeypatch
+
+monkeypatch()

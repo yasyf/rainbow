@@ -1,11 +1,13 @@
 import datetime
+import dateutil.rrule
+import icalendar
 from rainbow.enums.day_of_the_week import DayOfTheWeek
 from rainbow.helpers.dates import week_of_the_month
 from rainbow.models.event import MonthlyEvent
 
 
 class MonthlyDayOfTheWeekEvent(MonthlyEvent):
-    def __init__(self, day_of_the_week: DayOfTheWeek = None, week: int = None, **kwargs):
+    def __init__(self, day_of_the_week: DayOfTheWeek=None, week: int=None, **kwargs):
         self.day_of_the_week = day_of_the_week
         self.week = week
         super().__init__(**kwargs)
@@ -22,3 +24,7 @@ class MonthlyDayOfTheWeekEvent(MonthlyEvent):
             return False
         return self.week == week_of_the_month(date)
 
+    def rrule(self):
+        byweekday = '+{}{}'.format(self.week, dateutil.rrule.weekday(self.day_of_the_week))
+        return icalendar.vRecur(freq='MONTHLY', interval=self.skip_months + 1,
+                        byday=byweekday)
