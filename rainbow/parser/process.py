@@ -214,6 +214,7 @@ def recurrent_process(event, title, extra):
     return events
 
 def parse_time(event):
+    event = event.replace('AM', 'am').replace('PM', 'pm')
     dt = datetime.datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
     r = RecurringEvent(now_date=dt)
     start_date, success = r.parse_time(event, dt)
