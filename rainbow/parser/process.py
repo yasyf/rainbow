@@ -101,9 +101,10 @@ def one_time_process(date):
 
 def contains_date(event):
     r = RecurringEvent(now_date=datetime.datetime.utcnow())
-    if r.parse(event) is None:
+    try:
+        return r.parse(event) is not None
+    except ValueError:
         return False
-    return True
 
 def is_recurring(event):
     r = RecurringEvent(now_date=datetime.datetime.utcnow())
@@ -128,20 +129,26 @@ def recurrent_parse(event):
 def recurrent_process(event, title, extra):
     events = []
     params = event.get_params()
-    if params['freq'] == 'weekly':
+    start_time = extra.get('start_time')
+
+    if params['freq'] == 'yearly':
+        return events
+    elif params['freq'] == 'weekly':
         days = params['byday'].split(',')
         group = uuid.uuid4()
         for day in days:
-            events.append(WeeklyEvent(group_id=group, day_of_the_week = DayOfTheWeek[day], skip_weeks=params['interval'] - 1, title=title, start_time=extra.get('start_time')))
+            if len(day) == 3:
+                day = day[1:]
+            events.append(WeeklyEvent(group_id=group, day_of_the_week=DayOfTheWeek[day], skip_weeks=params['interval'] - 1, title=title, start_time=start_time))
     else:
         if 'byday' in params:
-            if len(params['byday']) == 3:
-                day = params['byday'][1:3]
-                week = int(params['byday'][0])
-            else:
-                day = params['byday']
-                week = 1
-            events.append(MonthlyDayOfTheWeekEvent(skip_months=int(params['interval']) - 1, day_of_the_week=DayOfTheWeek[day], week=week, title=title, start_time=start_time))
+            for day in params['byday'].split(','):
+                if len(day) == 3:
+                    day = day[1:]
+                    week = int(day[0])
+                else:
+                    week = 1
+                events.append(MonthlyDayOfTheWeekEvent(skip_months=int(params['interval']) - 1, day_of_the_week=DayOfTheWeek[day], week=week, title=title, start_time=start_time))
         else:
             events.append(MonthlyDayOfTheMonthEvent(skip_months=int(params['interval']) - 1, date=int(params['bymonthday']), title=title, start_time=start_time))
     return events

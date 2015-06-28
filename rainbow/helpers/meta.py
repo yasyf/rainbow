@@ -6,7 +6,10 @@ def get_url(event):
     query = urllib.parse.quote_plus(event.title)
     url = "http://ajax.googleapis.com/ajax/services/search/web?v=1.0&q={}".format(query)
     response = requests.get(url).json()
-    return response['responseData']['results'][0]['unescapedUrl']
+    try:
+        return response['responseData']['results'][0]['unescapedUrl']
+    except TypeError:
+        return None
 
 def get_url_and_description(event):
     cached = googlecache.find_one({'title': event.title})
@@ -14,8 +17,9 @@ def get_url_and_description(event):
         return cached['url'], cached['description']
     parser = GetDescriptionHTMLParser()
     url = get_url(event)
-    parser.feed(requests.get(url).text)
-    googlecache.insert({'title': event.title, 'url': url, 'description': parser.description})
+    if url:
+        parser.feed(requests.get(url).text)
+        googlecache.insert_one({'title': event.title, 'url': url, 'description': parser.description})
     return url, parser.description
 
 class GetDescriptionHTMLParser(HTMLParser):

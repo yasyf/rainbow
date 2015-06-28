@@ -9,7 +9,7 @@ class MonthlyEvent(Event, metaclass=ABCMeta):
 
     def check_assertions(self):
         super().check_assertions()
-        assert 0 <= self.skip_months <= 11, "invalid skip_months"
+        assert 0 <= self.skip_months <= 11, "invalid skip_months ({})".format(self.skip_months)
 
     def is_on_date(self, date: datetime.date) -> bool:
         if not super().is_on_date(date):
