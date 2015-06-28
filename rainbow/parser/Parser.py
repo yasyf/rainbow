@@ -23,8 +23,10 @@ datePattern = """
 DateChunker = nltk.RegexpParser(datePattern)
 TitleChunker = nltk.RegexpParser(titlePattern)
 
+
 def parse(text):
     events = [s.strip() for s in text.splitlines()]
+    parsed_events = []
     for event in events:
         formatted_sentence = format(event)
         noun_phrases = list(get_terms(formatted_sentence, "NP"))
@@ -33,7 +35,9 @@ def parse(text):
         noun_phrase = list(noun_phrases[0])
         formatted_date = datetime.datetime.strptime(' '.join(date),"%B %d %Y")
         formatted_title = ' '.join(noun_phrase)
-        return OneTimeEvent(date=formatted_date, title=formatted_title).to_dict()
+        events.append(OneTimeEvent(date=formatted_date, title=formatted_title).to_dict())
+    return parsed_events
+
 
 def format(sentence):
     tokens = nltk.word_tokenize(sentence)
@@ -42,10 +46,12 @@ def format(sentence):
     result = TitleChunker.parse(result)
     return result
 
+
 def leaves(tree, label):
     """Finds NP (nounphrase) leaf nodes of a chunk tree."""
     for subtree in tree.subtrees(filter = lambda t: t.label()==label):
         yield subtree.leaves()
+
 
 def get_terms(tree, label):
     for leaf in leaves(tree, label):
@@ -61,6 +67,7 @@ def normalise(word):
     word = stemmer.stem_word(word)
     word = lemmatizer.lemmatize(word)
     return word
+
 
 def acceptable_word(word):
     """Checks conditions for acceptable word: length, stopword."""
@@ -83,5 +90,3 @@ def acceptable_word(word):
 # for term in dates:
 #         for word in term:
 #            print(word)
-
-parse(sentence)
