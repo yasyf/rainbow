@@ -24,7 +24,7 @@ class Parser():
                     # attempt to match our title grammar
                     np_tagged = process(event, self.title_chunker)
                     noun_phrase = next(self.get_terms(np_tagged, "NP"))
-                    formatted_title = ' '.join(noun_phrase)
+                    formatted_title = self.sanitize(' '.join(noun_phrase))
                     try:
                         # attempt to match our date grammar
                         date_tagged = process(event, self.date_chunker)
@@ -36,7 +36,7 @@ class Parser():
                         if contains_date(event):
                             if is_recurring(event):
                                 recurring_params = recurrent_parse(event)
-                                
+
                             else:
                                 formatted_date = recurrent_parse(event)
                                 parsed_events.append(OneTimeEvent(date=formatted_date, title=formatted_title))
@@ -60,3 +60,6 @@ class Parser():
         for leaf in self.leaves(tree, label):
             term = [ word for word, tag in leaf]
             yield term
+
+    def sanitize(self, dirty_string):
+        return dirty_string.strip()
