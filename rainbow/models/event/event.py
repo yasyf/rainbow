@@ -16,7 +16,7 @@ class Event(object, metaclass=ABCMeta):
         self.start_date = start_date or datetime.date.today()
         self.end_date = end_date
         self.location = location
-        self.start_time = start_time or datetime.time()
+        self.start_time = start_time
         self.end_time = end_time
         try:
             self.check_assertions()
@@ -50,12 +50,19 @@ class Event(object, metaclass=ABCMeta):
                 'longitude': self.longitude,
             },
             'rrule': self.rrule().to_ical().decode() if self.rrule() else None,
-            'start': datetime.datetime.combine(self.start_date, self.start_time),
-            'end': datetime.datetime.combine(self.end_date or self.start_date,
-                                             self.end_date or self.start_time)
-                                            if self.end_date or self.end_time
-                                            else None
+            'start': self._start,
+            'end': self._end if self.end_date or self.end_time else None
         }
+
+    @property
+    def _start(self):
+        return datetime.datetime.combine(self.start_date, self.start_time) if self.start_time \
+            else self.start_date
+
+    @property
+    def _end(self):
+        return datetime.datetime.combine(self.end_date or self.start_date, self.end_time) \
+            if self.end_time else self.end_date
 
     def to_ical(self) -> icalendar.Event:
         event = icalendar.Event()
@@ -67,12 +74,9 @@ class Event(object, metaclass=ABCMeta):
         rrule = self.rrule()
         if rrule:
             event.add('rrule', rrule)
-        start = datetime.datetime.combine(self.start_date, self.start_time)
-        event.add('dtstart', start)
+        event.add('dtstart', self._start)
         if self.end_date or self.end_time:
-            end = datetime.datetime.combine(self.end_date or self.start_date,
-                                            self.end_time or self.start_time)
-            event.add('dtend', end)
+            event.add('dtend', self._end)
         return event
 
     @abstractmethod
@@ -80,7 +84,8 @@ class Event(object, metaclass=ABCMeta):
         assert self.title is not None
         assert isinstance(self.group_id, uuid.UUID)
         assert isinstance(self.start_date, datetime.date)
-        assert isinstance(self.start_time, datetime.time)
+        if self.start_time:
+            assert isinstance(self.start_time, datetime.time)
         if self.end_time:
             assert isinstance(self.end_time, datetime.time)
 
@@ -92,6 +97,9 @@ class Event(object, metaclass=ABCMeta):
 
     def is_on_day_of_month(self, day: int, month: int) -> bool:
         return self.is_on_date(datetime.date.today().replace(day=day, month=month))
+
+    def __repr__(self):
+        return repr(self.to_dict())
 
 class EventError(RuntimeError):
     pass
