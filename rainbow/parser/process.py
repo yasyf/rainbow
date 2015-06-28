@@ -108,10 +108,11 @@ def contains_date(event):
 
 def is_recurring(event):
     r = RecurringEvent(now_date=datetime.datetime.utcnow())
-    r.parse(event)
-    if r.is_recurring:
-        return True
-    return False
+    try:
+        r.parse(event)
+        return r.is_recurring
+    except ValueError:
+        return False
 
 def non_recurrent_parse(event):
     r = RecurringEvent(now_date=datetime.datetime.utcnow())
@@ -130,6 +131,9 @@ def recurrent_process(event, title, extra):
     events = []
     params = event.get_params()
     start_time = extra.get('start_time')
+
+    if 'freq' not in params:
+        return events
 
     if params['freq'] == 'yearly':
         return events
