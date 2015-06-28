@@ -9,9 +9,11 @@ icalendar==3.9.0
 itsdangerous==0.24
 nltk==3.0.3
 numpy==1.9.2
+parsedatetime==1.5
 pymongo==3.0.2
 python-dateutil==2.4.2
 pytz==2015.4
+-e git+git://github.com/michaelshum/recurrent.git#egg=recurrent
 requests==2.7.0
 six==1.9.0
 webassets==0.10.1
