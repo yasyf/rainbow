@@ -41,6 +41,12 @@ class Event(object, metaclass=ABCMeta):
         if found:
             return found['lng']
 
+    @property
+    def full_description(self):
+        description = self.description or ''
+        website = self.website or ''
+        return "{}\n{}".format(description, website).strip()
+
     @abstractmethod
     def rrule(self) -> icalendar.vRecur:
         return None
@@ -50,7 +56,7 @@ class Event(object, metaclass=ABCMeta):
             'uid': self.uid,
             'group_id': self.group_id,
             'title': self.title,
-            'description': self.description,
+            'description': self.full_description,
             'location': {
                 'value': self.location,
                 'latitude': self.latitude,
@@ -75,9 +81,9 @@ class Event(object, metaclass=ABCMeta):
         event = icalendar.Event()
         event.add('uid', self.uid)
         event.add('summary', self.title)
-        for field in ['description', 'location']:
-            if getattr(self, field):
-                event.add(field, getattr(self, field))
+        if self.location:
+            event.add('location', self.location)
+        event.add('description', self.full_description)
         rrule = self.rrule()
         if rrule:
             event.add('rrule', rrule)
