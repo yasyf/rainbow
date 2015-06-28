@@ -27,6 +27,8 @@ class Parser(object):
                         date_tagged = process(event, self.date_chunker)
                         date = next(self.get_terms(date_tagged, "DATE"))
                         formatted_date = one_time_process(date)
+                        if not formatted_date:
+                            raise StopIteration
                         if formatted_date.time():
                             parsed_events.append(OneTimeEvent(date=formatted_date, title=formatted_title, start_time=formatted_date.time()))
                         else:
@@ -44,6 +46,8 @@ class Parser(object):
                                     continue
                             else:
                                 formatted_date = non_recurrent_parse(event)
+                                if not formatted_date:
+                                    continue
                                 if formatted_date.time():
                                     parsed_events.append(OneTimeEvent(date=formatted_date, title=formatted_title, start_time=formatted_date.time()))
                                 else:
