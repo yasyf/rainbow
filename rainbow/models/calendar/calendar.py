@@ -66,6 +66,9 @@ class Calendar(object):
         else:
             return cls(url, type, '', [])
 
+    def destroy(self):
+        calendars.remove({'url': self.url})
+
     def save(self):
         found = self._find_by_url(self.url)
         if found:

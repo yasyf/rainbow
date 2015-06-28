@@ -19,7 +19,10 @@ def parse_calendar(type_, file, user_geo, existing_data=None):
     print('Processing {}'.format(file))
     importer = Importer.get_importer(type_)
     data = importer().open(file).read()
-    if not data or data == existing_data:
+    if not data:
+        Calendar.from_url(file, type_).destroy()
+        return
+    if data == existing_data:
         return
     events = Parser().parse(data)
     if all(user_geo):
@@ -31,7 +34,7 @@ def parse_calendar(type_, file, user_geo, existing_data=None):
 
 
 class Pooler(object):
-    pool = Pool(5)
+    pool = Pool(2)
 
     @classmethod
     def submit(cls, f, *args):
