@@ -1,6 +1,6 @@
 from flask import render_template, Response, jsonify, request
 from .app import app
-from rainbow.helpers.threading import Pooler, parse_calendar
+from rainbow.helpers.threads import Pooler, parse_calendar
 from rainbow.models.calendar.calendar import Calendar
 
 
