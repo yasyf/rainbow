@@ -20,7 +20,8 @@ def index_view():
 def api_create_view():
     calendar = Calendar.from_url(request.form['url'])
     _id = calendar.save()
-    Pooler.submit(parse_calendar, request.form['type'], request.form['url'])
+    user_geo = (request.form.get('lat'), request.form.get('lng'))
+    Pooler.submit(parse_calendar, request.form['type'], request.form['url'], user_geo)
     return jsonify({'status': 'success', 'id': str(_id)})
 
 @app.route('/api/calendar/<_id>.vcs')
