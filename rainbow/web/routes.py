@@ -24,7 +24,7 @@ def api_create_view():
     Pooler.submit(parse_calendar, request.form['type'], request.form['url'], user_geo)
     return jsonify({'status': 'success', 'id': str(_id)})
 
-@app.route('/api/calendar/<_id>.vcs')
+@app.route('/api/calendar/<_id>.ics')
 def ics_calendar_view(_id):
     calendar = Calendar.find(_id)
     return Response(calendar.to_ical(), mimetype='text/calendar')

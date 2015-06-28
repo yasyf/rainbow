@@ -4,7 +4,7 @@ from rainbow.helpers.mongo import calendars
 
 
 class Calendar(object):
-    VERSION = 1.0
+    VERSION = 2.0
 
     def __init__(self, url: str, type: str, data: str, events):
         self.prodid = '-//{}//{}//'.format(self.__class__.__name__, self.__class__.__module__)

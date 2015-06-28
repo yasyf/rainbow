@@ -11,6 +11,9 @@ FlaskStart.controller 'IndexCtrl', ['$scope', '$timeout', ($scope, $timeout) ->
         lng: -122.343750
       zoom: 13
 
+  panToUser = ->
+    $scope.map?.panTo new google.maps.LatLng($scope.data.lat, $scope.data.lng)
+
   populateMap = (events, oldEvents) ->
     return if events is oldEvents or _.isEqual(events, oldEvents)
     return unless $scope.map?
@@ -43,14 +46,15 @@ FlaskStart.controller 'IndexCtrl', ['$scope', '$timeout', ($scope, $timeout) ->
       marker
 
     $scope.map.fitBounds $scope.bounds
+    panToUser()
 
   $(document).ready ->
     initMap()
     navigator?.geolocation.getCurrentPosition (position) ->
       $timeout ->
-        $scope.map.panTo new google.maps.LatLng(position.coords.latitude, position.coords.longitude)
         $scope.data.lat = position.coords.latitude
         $scope.data.lng = position.coords.longitude
+        panToUser()
 
   pollForEvents = (id, deferred = undefined) ->
     unless deferred?
@@ -82,6 +86,6 @@ FlaskStart.controller 'IndexCtrl', ['$scope', '$timeout', ($scope, $timeout) ->
       .progress (id, events) ->
         $timeout ->
           $scope.data.events = events
-          $scope.data.calendarURL = "https://#{document.location.host}/api/calendar/#{id}.vcs"
+          $scope.data.calendarURL = "https://#{document.location.host}/api/calendar/#{id}.ics"
 
 ]
