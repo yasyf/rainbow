@@ -1,15 +1,15 @@
-FlaskStart.controller 'IndexCtrl', ['$scope', '$timeout', ($scope, $timeout) ->
-  $scope.data = {}
+FlaskStart.controller 'IndexCtrl', ['$scope', '$timeout', '$location', ($scope, $timeout, $location) ->
+  $scope.data =
+    docURL: $location.search().url
   $scope.lastEvents = []
   $scope.markers = []
-  $scope.bounds = new google.maps.LatLngBounds()
 
   initMap = ->
     $scope.map = new google.maps.Map $('#map-canvas')[0],
       center:
         lat: 37.580254
         lng: -122.343750
-      zoom: 13
+      zoom: 10
 
   panToUser = ->
     $scope.map?.panTo new google.maps.LatLng($scope.data.lat, $scope.data.lng)
@@ -35,7 +35,6 @@ FlaskStart.controller 'IndexCtrl', ['$scope', '$timeout', ($scope, $timeout) ->
         position: new google.maps.LatLng(event.location.latitude, event.location.longitude)
         map: $scope.map
         title: event.title
-      $scope.bounds.extend marker.getPosition()
       link = $('<a>').text(event.title).click ->
         marker.getMap().panTo(marker.getPosition())
       $('#events-list').append($('<li>').append(link))
@@ -45,7 +44,6 @@ FlaskStart.controller 'IndexCtrl', ['$scope', '$timeout', ($scope, $timeout) ->
         infoWindow.open marker.getMap(), marker
       marker
 
-    $scope.map.fitBounds $scope.bounds
     panToUser()
 
   $(document).ready ->
@@ -55,6 +53,7 @@ FlaskStart.controller 'IndexCtrl', ['$scope', '$timeout', ($scope, $timeout) ->
         $scope.data.lat = position.coords.latitude
         $scope.data.lng = position.coords.longitude
         panToUser()
+        fetchNewEvents($scope.data.docURL) if $scope.data.docURL?
 
   pollForEvents = (id, deferred = undefined) ->
     unless deferred?
@@ -71,21 +70,25 @@ FlaskStart.controller 'IndexCtrl', ['$scope', '$timeout', ($scope, $timeout) ->
       , timeout
     deferred.promise()
 
+  fetchNewEvents = (url) ->
+    $scope.data.calendarURL = "Loading..."
+    $.post '/api/calendar',
+      url: url
+      type: 'google_docs'
+      lat: $scope.data.lat
+      lng: $scope.data.lng
+    .then (response) ->
+      pollForEvents(response.id)
+    .progress (id, events) ->
+      $timeout ->
+        $scope.data.events = _.uniq events, 'group_id'
+        $scope.data.calendarURL = "https://#{document.location.host}/api/calendar/#{id}.ics"
+
   $scope.$watch 'data.events', populateMap
 
   $scope.$watch 'data.docURL', (newDocURL, oldDocURL) ->
     if newDocURL and newDocURL isnt oldDocURL
-      $scope.data.calendarURL = "Loading..."
-      $.post '/api/calendar',
-        url: newDocURL
-        type: 'google_docs'
-        lat: $scope.data.lat
-        lng: $scope.data.lng
-      .then (response) ->
-        pollForEvents(response.id)
-      .progress (id, events) ->
-        $timeout ->
-          $scope.data.events = _.uniq events, 'group_id'
-          $scope.data.calendarURL = "https://#{document.location.host}/api/calendar/#{id}.ics"
+      $location.search 'url', newDocURL
+      fetchNewEvents newDocURL
 
 ]
