@@ -79,6 +79,8 @@ class Event(object, metaclass=ABCMeta):
         rrule = self.rrule()
         if rrule:
             event.add('rrule', rrule)
+            if not self.is_on_date(datetime.date.today()):
+                event.add('exdate', datetime.date.today())
         event.add('dtstart', self._start)
         if self.end_date or self.end_time:
             event.add('dtend', self._end)
