@@ -1,6 +1,7 @@
 FlaskStart.controller 'IndexCtrl', ['$scope', '$timeout', ($scope, $timeout) ->
   $scope.data = {}
   $scope.lastEvents = []
+  $scope.markers = []
   $scope.bounds = new google.maps.LatLngBounds()
 
   initMap = ->
@@ -15,12 +16,15 @@ FlaskStart.controller 'IndexCtrl', ['$scope', '$timeout', ($scope, $timeout) ->
 
     uuids = _.map events, 'group_id'
 
-    if _.isEqual $scope.lastEvents, uuids
+    if _.isEqual($scope.lastEvents, uuids)
       return
 
     $scope.lastEvents = uuids
 
-    _.each events, (event) ->
+    _.each $scope.markers, (marker) ->
+      marker.setMap(null)
+
+    $scope.markers = _.map events, (event) ->
       marker = new google.maps.Marker
         position: new google.maps.LatLng(event.location.latitude, event.location.longitude)
         map: $scope.map
@@ -33,6 +37,7 @@ FlaskStart.controller 'IndexCtrl', ['$scope', '$timeout', ($scope, $timeout) ->
         content: event.description or event.location.value or event.title
       google.maps.event.addListener marker, 'click', ->
         infoWindow.open marker.getMap(), marker
+      marker
 
     $scope.map.fitBounds $scope.bounds
 

@@ -9,7 +9,7 @@ class CalendarTest(unittest.TestCase):
     def test_to_ical(self):
         ical = self.calendar.to_ical().decode()
         self.assertIn('BEGIN:VCALENDAR', ical)
-        self.assertEqual(728, len(ical))
+        self.assertEqual(680, len(ical))
 
 if __name__ == '__main__':
     unittest.main()
