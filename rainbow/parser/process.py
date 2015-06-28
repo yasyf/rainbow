@@ -2,7 +2,7 @@ import nltk
 import string
 from recurrent import RecurringEvent
 import datetime
-from rainbow.enums import day_of_the_week
+from rainbow.enums.day_of_the_week import DayOfTheWeek
 from rainbow.models.event import WeeklyEvent
 from rainbow.models.event.monthly.monthly_day_of_the_month_event import MonthlyDayOfTheMonthEvent
 from rainbow.models.event.monthly.monthly_day_of_the_week_event import MonthlyDayOfTheWeekEvent
@@ -75,10 +75,17 @@ def recurrent_parse(event):
 def recurrent_process(event, title):
     params = event.get_params()
     if params['freq'] == 'weekly':
-        event = WeeklyEvent(day_of_the_week = day_of_the_week[params['byday']], skip_weeks = params['interval']-1, title = title)
+        event = WeeklyEvent(day_of_the_week = DayOfTheWeek[params['byday']], skip_weeks = params['interval']-1, title = title)
     else:
         if 'byday' in params:
-            event = MonthlyDayOfTheWeekEvent(skip_months = int(params['interval'])-1, day_of_the_week = int(params['byday'][1:2]), week = int(params['byday'][0]), title = title)
+            print(params['byday'])
+            if len(params['byday']) == 3:
+                day = params['byday'][1:3]
+                week = int(params['byday'][0])
+            else:
+                day = params['byday']
+                week = 1
+            event = MonthlyDayOfTheWeekEvent(skip_months = int(params['interval'])-1, day_of_the_week = DayOfTheWeek[day], week = int(params['byday'][0]), title = title)
         else:
             event = MonthlyDayOfTheMonthEvent(skip_months = int(params['interval'])-1, date = int(params['bymonthday']), title = title)
     return event
