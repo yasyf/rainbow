@@ -1,6 +1,8 @@
 import datetime, uuid
 from abc import ABCMeta, abstractmethod
-import icalendar, dateutil.rrule
+import icalendar
+from rainbow.helpers.mongo import geocache
+
 
 class Event(object, metaclass=ABCMeta):
     def __init__(self, group_id: uuid.UUID=None, title: str=None, description: str=None,
@@ -23,11 +25,15 @@ class Event(object, metaclass=ABCMeta):
 
     @property
     def latitude(self) -> float:
-        return None
+        found = geocache.find_one({'location': self.location}) if self.location else None
+        if found:
+            return found['lat']
 
     @property
     def longitude(self) -> float:
-        return None
+        found = geocache.find_one({'location': self.location}) if self.location else None
+        if found:
+            return found['lng']
 
     @abstractmethod
     def rrule(self) -> icalendar.vRecur:
