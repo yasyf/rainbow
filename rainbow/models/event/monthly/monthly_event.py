@@ -3,7 +3,7 @@ import datetime
 from rainbow.models.event.event import Event
 
 class MonthlyEvent(Event, metaclass=ABCMeta):
-    def __init__(self, skip_months: int = None, **kwargs):
+    def __init__(self, skip_months: int=None, **kwargs):
         self.skip_months = skip_months
         super().__init__(**kwargs)
 

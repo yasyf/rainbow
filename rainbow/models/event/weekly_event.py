@@ -1,4 +1,6 @@
 import datetime
+import dateutil.rrule
+import icalendar
 from .event import Event
 from ...enums.day_of_the_week import DayOfTheWeek
 
@@ -25,3 +27,8 @@ class WeeklyEvent(Event):
         if weeks_skipped == 0:
             return True
         return (weeks_skipped % (self.skip_weeks + 1)) == 0
+
+    def rrule(self):
+        byday = dateutil.rrule.weekday(self.day_of_the_week)
+        return icalendar.vRecur(freq='weekly', interval=self.skip_weeks + 1,
+                                byday=byday)
