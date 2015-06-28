@@ -36,7 +36,8 @@ class Parser(object):
                                     recurring_params = recurrent_parse(event)
                                     parsed_events.extend(recurrent_process(recurring_params, formatted_title))
                                 except:
-                                    print("exception")
+                                    import traceback
+                                    traceback.print_exc()
                                     continue
                             else:
                                 formatted_date = non_recurrent_parse(event)
