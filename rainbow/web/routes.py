@@ -1,12 +1,13 @@
-from flask import render_template, Response, jsonify, request
+from flask import render_template, Response, jsonify, request, g
 from .app import app
 from rainbow.helpers.threads import Pooler, parse_calendar
 from rainbow.models.calendar.calendar import Calendar
+import os
 
 
 @app.before_request
 def preprocess_request():
-  pass
+  g.google_api_key = os.getenv('GOOGLE_API_KEY')
 
 @app.after_request
 def postprocess_request(response):
