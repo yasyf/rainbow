@@ -61,9 +61,9 @@ def get_terms(tree, label):
 
 def normalise(word):
     """Normalises words to lowercase and stems and lemmatizes it."""
-    word = word.lower()
-    word = stemmer.stem_word(word)
-    word = lemmatizer.lemmatize(word)
+    #word = word.lower()
+    #word = stemmer.stem_word(word)
+    #word = lemmatizer.lemmatize(word)
     return word
 
 
