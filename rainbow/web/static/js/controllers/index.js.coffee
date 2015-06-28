@@ -1,12 +1,18 @@
 FlaskStart.controller 'IndexCtrl', ['$scope', '$timeout', ($scope, $timeout) ->
   $scope.data = {}
 
+  $(document).ready ->
+    navigator?.geolocation.getCurrentPosition (position) ->
+      $timeout ->
+        $scope.data.lat = position.coords.latitude
+        $scope.data.lng = position.coords.longitude
+
   pollForEvents = (id, deferred = undefined) ->
     unless deferred?
       deferred = $.Deferred()
     $.get("/api/calendar/#{id}.json").then (response) ->
       if response.events.length > 0
-        deferred.resolve(id)
+        deferred.resolve(id, response.events)
       else
         $timeout ->
           pollForEvents(id, deferred)
@@ -14,15 +20,18 @@ FlaskStart.controller 'IndexCtrl', ['$scope', '$timeout', ($scope, $timeout) ->
     deferred.promise()
 
   $scope.$watch 'data.docURL', (newDocURL, oldDocURL) ->
-    if newDocURL? and newDocURL isnt oldDocURL
+    if newDocURL and newDocURL isnt oldDocURL
       $scope.data.calendarURL = "Loading..."
       $.post '/api/calendar',
         url: newDocURL
         type: 'google_docs'
+        lat: $scope.data.lat
+        lng: $scope.data.lng
       .then (response) ->
         pollForEvents(response.id)
-      .then (id) ->
+      .then (id, events) ->
+        console.log events
         $timeout ->
-          $scope.data.calendarURL = "http://#{document.location.host}/api/calendar/#{id}.vcs"
+          $scope.data.calendarURL = "https://#{document.location.host}/api/calendar/#{id}.vcs"
 
 ]

@@ -1,36 +1,28 @@
-from xml.dom import minidom
-import urllib.request, math
+import urllib.parse, requests, os
+from rainbow.helpers.mongo import geocache
 
-def get_closest_event_lat_lng(event, lat, lng):
-    min_arc = 2
-    closest_loc = None
+def cache_geolocation_info_for_event(event, lat, lng):
+    lat, lng, name = None, None, None
+    cached = geocache.find_one({'original_name': event.title})
 
-    url = "https://maps.googleapis.com/maps/api/place/textsearch/xml?query=%s&key=AIzaSyCfWZ1V6gJ-51aVwIbXuLbh3u-rsGDxaDE" % event.title.replace(' ', '+')
-    locations = minidom.parse(urllib.request.urlopen(url)).getElementsByTagName("location")
-    for location in locations:
-        loc_lat = float(location.getElementsByTagName("lat")[0].firstChild.nodeValue)
-        loc_lng = float(location.getElementsByTagName("lng")[0].firstChild.nodeValue)
-        arc = distance_on_unit_sphere(lat, lng, loc_lat, loc_lng)
-        if arc < min_arc:
-            min_arc = arc
-            closest_loc = (loc_lat, loc_lng)
-
-    if closest_loc == None:
-        raise Exception("no locations returned from searching: " + event.title)
+    if cached:
+        lat, lng, name = [cached.get(x) for x in ['lat, lng, location']]
     else:
-        return closest_loc
+        api_root = "https://maps.googleapis.com/maps/api/place/textsearch/json"
+        url_template = api_root + "?query={q}&key={k}&location={l}&radius={r}"
 
-def distance_on_unit_sphere(lat1, long1, lat2, long2):
-    degrees_to_radians = math.pi/180.0
+        api_key = os.getenv('GOOGLE_API_KEY')
+        query = urllib.parse.quote_plus(event.title)
+        lat_lng = '{},{}'.format(lat, lng)
+        url = url_template.format(q=query, k=api_key, r=50000, l=lat_lng)
+        locations = requests.get(url).json()['results']
 
-    phi1 = (90.0 - lat1)*degrees_to_radians
-    phi2 = (90.0 - lat2)*degrees_to_radians
+        if locations:
+            name = locations[0]['name']
+            location = locations[0]['geometry']['location']
+            lat, lng = location['lat'], location['lng']
 
-    theta1 = long1*degrees_to_radians
-    theta2 = long2*degrees_to_radians
-
-    cos = (math.sin(phi1)*math.sin(phi2)*math.cos(theta1 - theta2) +
-           math.cos(phi1)*math.cos(phi2))
-    arc = math.acos( cos )
-
-    return arc
+    if lat:
+        event.location = name
+        update = {'lat': lat, 'lng': lng, 'original_name': event.title, 'location': name}
+        geocache.update({'location': name}, update, upsert=True)
