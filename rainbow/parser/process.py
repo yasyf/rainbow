@@ -40,9 +40,25 @@ def process(sentence, one_time_event_chunker):
     result = one_time_event_chunker.parse(tagged)
     return result
 
-def date_process(date):
+def one_time_process(date):
     table = str.maketrans("", "", string.punctuation)
     date_string = ' '.join(date).translate(table)
-    r = RecurringEvent(now_date=datetime.datetime(2010, 1, 1))
-    onetimedate = r.parse(date_string)
-    return onetimedate
+    r = RecurringEvent(now_date=datetime.datetime.utcnow())
+    return(r.parse(date_string))
+
+def contains_date(event):
+    r = RecurringEvent(now_date=datetime.datetime.utcnow())
+    if r.parse(event) is None:
+        return False
+    return True
+
+def is_recurring(event):
+    r = RecurringEvent(now_date=datetime.datetime.utcnow())
+    r.parse(event)
+    if r.is_recurring:
+        return True
+    return False
+
+def recurrent_parse(event):
+    r = RecurringEvent(now_date=datetime.datetime.utcnow())
+    return r.parse(event)
