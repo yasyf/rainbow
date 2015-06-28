@@ -13,7 +13,7 @@ class Parser(object):
         self.title_chunker = nltk.RegexpParser(self.title_pattern)
 
     def parse(self,text):
-        events = [s.strip() for s in text.strip().splitlines()]
+        events = [s.strip() for s in self.sanitize(text).splitlines()]
         parsed_events = []
         for event in events:
             if event:
@@ -65,4 +65,4 @@ class Parser(object):
             yield term
 
     def sanitize(self, dirty_string):
-        return dirty_string.strip()
+        return dirty_string.strip().strip('\ufeff')
