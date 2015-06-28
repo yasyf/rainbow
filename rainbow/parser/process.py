@@ -136,6 +136,8 @@ model = {
     'Of': 'OF'
 }
 
+
+
 def process(sentence, chunker):
     sentence = sentence.replace('/', ' / ')
     tokens = nltk.word_tokenize(sentence)
@@ -200,8 +202,8 @@ def recurrent_process(event, title, extra):
         if 'byday' in params:
             for day in params['byday'].split(','):
                 if len(day) == 3:
-                    day = day[1:]
                     week = int(day[0])
+                    day = day[1:]
                 else:
                     week = 1
                 events.append(MonthlyDayOfTheWeekEvent(skip_months=int(params['interval']) - 1, day_of_the_week=DayOfTheWeek[day], week=week, title=title, start_time=start_time))

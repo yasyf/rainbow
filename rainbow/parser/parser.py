@@ -41,6 +41,7 @@ class Parser(object):
                         if contains_date(event):
                             if is_recurring(event):
                                 try:
+                                    event = event.replace(',', '')
                                     recurring_params, extra_params = recurrent_parse(event)
                                     parsed_events.extend(recurrent_process(recurring_params, formatted_title, extra_params))
                                 except:
