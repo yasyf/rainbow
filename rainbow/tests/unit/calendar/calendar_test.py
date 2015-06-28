@@ -22,9 +22,9 @@ class CalendarTest(unittest.TestCase):
         self.calendar = Calendar(self.events)
 
     def test_to_ical(self):
-        ical = self.calendar.to_ical()
-        import pdb;pdb.set_trace()
-
+        ical = self.calendar.to_ical().decode()
+        self.assertIn('BEGIN:VCALENDAR', ical)
+        self.assertEqual(714, len(ical))
 
 if __name__ == '__main__':
     unittest.main()
