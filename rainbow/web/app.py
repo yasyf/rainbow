@@ -4,7 +4,7 @@ from werkzeug.contrib.fixers import ProxyFix
 from flask.ext import assets
 import os, glob
 from rainbow import dev
-from rainbow.helpers.json import RainbowJSONEncoder
+from rainbow.helpers.serialization import RainbowJSONEncoder
 from rainbow.helpers.threads import monitor
 
 app = Flask(__name__)
