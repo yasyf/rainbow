@@ -6,6 +6,7 @@ from rainbow.enums.day_of_the_week import DayOfTheWeek
 from rainbow.models.event import WeeklyEvent
 from rainbow.models.event.monthly.monthly_day_of_the_month_event import MonthlyDayOfTheMonthEvent
 from rainbow.models.event.monthly.monthly_day_of_the_week_event import MonthlyDayOfTheWeekEvent
+import uuid
 
 model = {
     '/': 'SLASH',
@@ -121,9 +122,13 @@ def recurrent_parse(event):
     return r
 
 def recurrent_process(event, title):
+    events = []
     params = event.get_params()
     if params['freq'] == 'weekly':
-        event = WeeklyEvent(day_of_the_week = DayOfTheWeek[params['byday']], skip_weeks = params['interval']-1, title = title)
+        days = params['byday'].split(',')
+        group = uuid.uuid4()
+        for day in days:
+            events.append(WeeklyEvent(group_id=group, day_of_the_week = DayOfTheWeek[day], skip_weeks=params['interval'] - 1, title=title))
     else:
         if 'byday' in params:
             if len(params['byday']) == 3:
@@ -132,7 +137,7 @@ def recurrent_process(event, title):
             else:
                 day = params['byday']
                 week = 1
-            event = MonthlyDayOfTheWeekEvent(skip_months = int(params['interval']) - 1, day_of_the_week=DayOfTheWeek[day], week=week, title =title)
+            events.append(MonthlyDayOfTheWeekEvent(skip_months=int(params['interval']) - 1, day_of_the_week=DayOfTheWeek[day], week=week, title=title))
         else:
-            event = MonthlyDayOfTheMonthEvent(skip_months = int(params['interval']) - 1, date=int(params['bymonthday']), title=title)
-    return event
+            events.append(MonthlyDayOfTheMonthEvent(skip_months=int(params['interval']) - 1, date=int(params['bymonthday']), title=title))
+    return events
