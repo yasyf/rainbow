@@ -11,6 +11,8 @@ rainbow/web/static/js/min/
 
 node_modules/
 
+logs/
+
 ### PyCharm ###
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm
 

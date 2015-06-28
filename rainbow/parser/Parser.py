@@ -27,15 +27,11 @@ def parse(text):
         formatted_sentence = format(event)
         noun_phrases = list(get_terms(formatted_sentence, "NP"))
         date = list(get_terms(formatted_sentence, "DATE"))
-        print("DATES:\n")
-        for term in date:
-            for word in term:
-                 print(word)
         date = list(date[0])
         noun_phrase = list(noun_phrases[0])
         formatted_date = datetime.datetime.strptime(' '.join(date),"%B %d , %Y")
         formatted_title = ' '.join(noun_phrase)
-        parsed_events.append(OneTimeEvent(date=formatted_date, title=formatted_title).to_dict())
+        parsed_events.append(OneTimeEvent(date=formatted_date, title=formatted_title))
     return parsed_events
 
 
@@ -43,7 +39,6 @@ def format(sentence):
     tokens = nltk.word_tokenize(sentence)
     tagged = nltk.pos_tag(tokens)
     result = oneTimeEventChunker.parse(tagged)
-    result.draw()
     return result
 
 
