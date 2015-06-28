@@ -20,8 +20,8 @@ class Event(object, metaclass=ABCMeta):
         self.start_time = start_time
         self.end_time = end_time
 
-        if not self.description or not self.website:
-            self.website, self.description = get_url_and_description(self)
+        # if not self.description or not self.website:
+        #     self.website, self.description = get_url_and_description(self)
 
         try:
             self.check_assertions()
