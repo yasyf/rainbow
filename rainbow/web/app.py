@@ -4,11 +4,13 @@ from werkzeug.contrib.fixers import ProxyFix
 from flask.ext import assets
 import os, glob
 from rainbow import dev
+from rainbow.helpers.json import RainbowJSONEncoder
 from rainbow.helpers.threads import monitor
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SK')
 app.wsgi_app = ProxyFix(app.wsgi_app)
+app.json_encoder = RainbowJSONEncoder
 
 env = assets.Environment(app)
 env.load_path = [os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir)]

@@ -59,12 +59,12 @@ class Calendar(object):
         return pickle.loads(picked)
 
     @classmethod
-    def from_url(cls, url):
+    def from_url(cls, url, type):
         found = cls._find_by_url(url)
         if found:
             return cls.from_pickle(found['pickle'])
         else:
-            return cls(url, None, None, [])
+            return cls(url, type, '', [])
 
     def save(self):
         found = self._find_by_url(self.url)

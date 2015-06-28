@@ -18,7 +18,7 @@ def index_view():
 
 @app.route('/api/calendar', methods=['POST'])
 def api_create_view():
-    calendar = Calendar.from_url(request.form['url'])
+    calendar = Calendar.from_url(request.form['url'], request.form['type'])
     _id = calendar.save()
     user_geo = (request.form.get('lat'), request.form.get('lng'))
     Pooler.submit(parse_calendar, request.form['type'], request.form['url'], user_geo)

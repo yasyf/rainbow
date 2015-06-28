@@ -4,7 +4,7 @@ from rainbow.helpers.location import cache_geolocation_info_for_event
 from rainbow.helpers.mongo import calendars
 from rainbow.importers import Importer
 from rainbow.models.calendar.calendar import Calendar
-from rainbow.parser.parser import parse
+from rainbow.parser.parser import Parser
 from rainbow import dev
 
 
@@ -19,9 +19,9 @@ def parse_calendar(type_, file, user_geo, existing_data=None):
     print('Processing {}'.format(file))
     importer = Importer.get_importer(type_)
     data = importer().open(file).read()
-    if data == existing_data:
+    if not data or data == existing_data:
         return
-    events = parse(data)
+    events = Parser().parse(data)
     if all(user_geo):
         for event in events:
             if not event.latitude:

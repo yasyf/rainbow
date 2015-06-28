@@ -1,10 +1,7 @@
-import nltk
 from rainbow.models.event import OneTimeEvent
 from rainbow.parser.process import *
-import datetime
-from recurrent import RecurringEvent
 
-class Parser():
+class Parser(object):
     def __init__(self):
         self.date_pattern = """
             DATE:{<MONTH><CD><,>*<CD>|<CD><SLASH><CD>(<SLASH><CD>)*|<CD|JJ><OF><MONTH>}
@@ -32,7 +29,7 @@ class Parser():
                         formatted_date = one_time_process(date)
                         parsed_events.append(OneTimeEvent(date=formatted_date, title=formatted_title))
                     except StopIteration:
-                        #no date found, checking recurrent
+                        # no date found, checking recurrent
                         if contains_date(event):
                             if is_recurring(event):
                                 try:
@@ -57,13 +54,13 @@ class Parser():
 
     def leaves(self, tree, label):
         """Finds NP (nounphrase) leaf nodes of a chunk tree."""
-        for subtree in tree.subtrees(filter = lambda t: t.label()==label):
+        for subtree in tree.subtrees(filter = lambda t: t.label() == label):
             yield subtree.leaves()
 
 
     def get_terms(self, tree, label):
         for leaf in self.leaves(tree, label):
-            term = [ word for word, tag in leaf]
+            term = [word for word, tag in leaf]
             yield term
 
     def sanitize(self, dirty_string):

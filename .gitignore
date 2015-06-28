@@ -1,7 +1,5 @@
 # Created by https://www.gitignore.io
 
-rainbow/parser/script.py
-
 .env
 
 rainbow/web/bower_components/
