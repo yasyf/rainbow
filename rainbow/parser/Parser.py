@@ -31,12 +31,9 @@ def parse(text):
         date = list(get_terms(formatted_sentence, "DATE"))
         date = list(date[0])
         noun_phrase = list(noun_phrases[0])
-        print("date", date)
-        print(noun_phrase)
         formatted_date = datetime.datetime.strptime(' '.join(date),"%B %d %Y")
         formatted_title = ' '.join(noun_phrase)
-        return OneTimeEvent(date=formatted_date, title=formatted_title)
-
+        return OneTimeEvent(date=formatted_date, title=formatted_title).to_dict()
 
 def format(sentence):
     tokens = nltk.word_tokenize(sentence)
