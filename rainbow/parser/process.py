@@ -128,7 +128,7 @@ def recurrent_process(event, title):
         days = params['byday'].split(',')
         group = uuid.uuid4()
         for day in days:
-            events.append(WeeklyEvent(group_id = group, day_of_the_week = DayOfTheWeek[day], skip_weeks = params['interval']-1, title = title))
+            events.append(WeeklyEvent(group_id=group, day_of_the_week = DayOfTheWeek[day], skip_weeks=params['interval'] - 1, title=title))
     else:
         if 'byday' in params:
             if len(params['byday']) == 3:
@@ -137,7 +137,7 @@ def recurrent_process(event, title):
             else:
                 day = params['byday']
                 week = 1
-            events.append(MonthlyDayOfTheWeekEvent(skip_months = int(params['interval'])-1, day_of_the_week = DayOfTheWeek[day], week = week, title = title))
+            events.append(MonthlyDayOfTheWeekEvent(skip_months=int(params['interval']) - 1, day_of_the_week=DayOfTheWeek[day], week=week, title=title))
         else:
-            events.append(MonthlyDayOfTheMonthEvent(skip_months = int(params['interval'])-1, date = int(params['bymonthday']), title = title))
+            events.append(MonthlyDayOfTheMonthEvent(skip_months=int(params['interval']) - 1, date=int(params['bymonthday']), title=title))
     return events
