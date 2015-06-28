@@ -29,15 +29,20 @@ class Parser():
                         # attempt to match our date grammar
                         date_tagged = process(event, self.date_chunker)
                         date = next(self.get_terms(date_tagged, "DATE"))
-                        ## format date as a datetime by calling dateprocess()
-                        formatted_date = ""
+                        formatted_date = one_time_process(date)
                         parsed_events.append(OneTimeEvent(date=formatted_date, title=formatted_title))
                     except StopIteration:
                         #no date found, checking recurrent
-                        
-                        formatted_date = datetime.datetime.strptime(' '.join(date),"%B %d %Y")
-                        formatted_title = ' '.join(noun_phrase)
-                        parsed_events.append(OneTimeEvent(date=formatted_date, title=formatted_title).to_dict())
+                        if contains_date(event):
+                            if is_recurring(event):
+                                recurring_params = recurrent_parse(event)
+                                
+                            else:
+                                formatted_date = recurrent_parse(event)
+                                parsed_events.append(OneTimeEvent(date=formatted_date, title=formatted_title))
+                        else:
+                            # no date found, skip to next event
+                            continue
                 except StopIteration:
                     # no title found, skip to next event
                     continue

@@ -1,5 +1,7 @@
 import nltk
 import string
+from recurrent import RecurringEvent
+import datetime
 
 model = {
     '/': 'SLASH',
@@ -26,10 +28,11 @@ model = {
     'november': 'MONTH',
     'dec': 'MONTH',
     'december': 'MONTH',
+    'of': 'OF',
 }
 
 def process(sentence, chunker):
-    sentence = sentence.replace('/', ' / ')
+    sentence = sentence.replace('/', ' / ').lower()
     tokens = nltk.word_tokenize(sentence)
     default_tagger = nltk.data.load(nltk.tag._POS_TAGGER)
     tagger = nltk.tag.UnigramTagger(model=model, backoff=default_tagger)
@@ -38,5 +41,8 @@ def process(sentence, chunker):
     return result
 
 def date_process(date):
-    predicate = lambda x:x not in string.punctuation
-    return filter(predicate, date)
+    table = str.maketrans("", "", string.punctuation)
+    date_string = ' '.join(date).translate(table)
+    r = RecurringEvent(now_date=datetime.datetime(2010, 1, 1))
+    onetimedate = r.parse(date_string)
+    return onetimedate
