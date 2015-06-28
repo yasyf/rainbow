@@ -43,7 +43,7 @@ August 23 : The Giant Race Half Marathon"""
         p = Parser()
         parsed = p.parse(trial)
         self.assertIsInstance(parsed[0],WeeklyEvent)
-        self.assertEquals(parsed[0].to_dict()['start'].time(),datetime.time(16))
+        self.assertEqual(parsed[0].to_dict()['start'].time(),datetime.time(16))
 
     def test_demo(self):
         trial = """
@@ -179,7 +179,7 @@ Gary Danko (Fisherman’s Wharf)
 """
         p = Parser()
         parsed = p.parse(trial)
-        self.assertIsInstance(parsed,list)
+        self.assertIsInstance(parsed, list)
 
 if __name__ == '__main__':
     unittest.main()
