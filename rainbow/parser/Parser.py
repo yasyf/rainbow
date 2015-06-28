@@ -5,7 +5,11 @@ import datetime
 lemmatizer = nltk.WordNetLemmatizer()
 stemmer = nltk.stem.porter.PorterStemmer()
 
-sentence = "Graylock Event in San Mateo: June 21, 2015"
+sentence = "Graylock Event in San Mateo: 6 / 21 , 2015"
+
+testPattern = """
+    TEST:{<CD><SLASH><CD>}
+    """
 
 oneTimeEventPattern = """
         DATE:{<NNP><CD><,><CD>}
@@ -18,7 +22,7 @@ oneTimeEventPattern = """
 
     """
 
-oneTimeEventChunker = nltk.RegexpParser(oneTimeEventPattern)
+oneTimeEventChunker = nltk.RegexpParser(testPattern)
 
 def parse(text):
     events = [s.strip() for s in text.splitlines()]
@@ -27,10 +31,6 @@ def parse(text):
         formatted_sentence = format(event)
         noun_phrases = list(get_terms(formatted_sentence, "NP"))
         date = list(get_terms(formatted_sentence, "DATE"))
-        print("DATES:\n")
-        for term in date:
-            for word in term:
-                 print(word)
         date = list(date[0])
         noun_phrase = list(noun_phrases[0])
         formatted_date = datetime.datetime.strptime(' '.join(date),"%B %d , %Y")
@@ -42,8 +42,9 @@ def parse(text):
 def format(sentence):
     tokens = nltk.word_tokenize(sentence)
     tagged = nltk.pos_tag(tokens)
+    tagged = [(x, "SLASH") if x == '/' else (x, y) for (x, y) in tagged]
     result = oneTimeEventChunker.parse(tagged)
-    result.draw()
+    #result.draw()
     return result
 
 
@@ -91,3 +92,7 @@ def acceptable_word(word):
 # for term in dates:
 #         for word in term:
 #            print(word)
+
+formatted_sentence = format(sentence)
+noun_phrases = list(get_terms(formatted_sentence, "TEST"))
+print("yolo", noun_phrases)
