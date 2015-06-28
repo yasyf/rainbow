@@ -13,12 +13,6 @@ class Parser():
             NP:
                 {<NBAR >}
         """
-        self.lemmatizer = nltk.WordNetLemmatizer()
-        self.stemmer = nltk.stem.porter.PorterStemmer()
-
-        self.testPattern = """
-            TEST:{<CD><SLASH><CD>}
-            """
 
         self.oneTimeEventChunker = nltk.RegexpParser(self.oneTimeEventPattern)
 
@@ -28,12 +22,10 @@ class Parser():
         for event in events:
             #formatted_sentence = format(event)
             formatted_sentence = process(event, self.oneTimeEventChunker)
-            noun_phrases = list(self.get_terms(formatted_sentence, "NP"))
-            date = list(self.get_terms(formatted_sentence, "DATE"))
-            date = list(date[0])
-            noun_phrase = list(noun_phrases[0])
+            noun_phrases = next(self.get_terms(formatted_sentence, "NP"))
+            date = next(self.get_terms(formatted_sentence, "DATE"))
             formatted_date = datetime.datetime.strptime(' '.join(date),"%B %d , %Y")
-            formatted_title = ' '.join(noun_phrase)
+            formatted_title = ' '.join(noun_phrases)
             parsed_events.append(OneTimeEvent(date=formatted_date, title=formatted_title).to_dict())
         return parsed_events
 
@@ -46,26 +38,5 @@ class Parser():
 
     def get_terms(self, tree, label):
         for leaf in self.leaves(tree, label):
-            term = [ self.normalise(word) for word, tag in leaf
-                if self.acceptable_word(word) ]
+            term = [ word for word, tag in leaf]
             yield term
-
-
-
-    def normalise(self, word):
-        """Normalises words to lowercase and stems and lemmatizes it."""
-        #word = word.lower()
-        #word = stemmer.stem_word(word)
-        #word = lemmatizer.lemmatize(word)
-        return word
-
-
-    def acceptable_word(self, word):
-        """Checks conditions for acceptable word: length, stopword."""
-        return True
-        #from nltk.corpus import stopwords
-        #stopwords = stopwords.words('english')
-
-        #accepted = bool(2 <= len(word) <= 40
-        #    and word.lower() not in stopwords)
-        #return accepted
