@@ -1,5 +1,4 @@
-from abc import ABCMeta, abstractmethod
-import rainbow.parser
+from abc import ABCMeta
 
 class Importer(metaclass=ABCMeta):
 
