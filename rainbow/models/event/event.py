@@ -33,6 +33,24 @@ class Event(object, metaclass=ABCMeta):
     def rrule(self) -> icalendar.vRecur:
         return None
 
+    def to_dict(self):
+        return {
+            'group_id': self.group_id,
+            'title': self.title,
+            'description': self.description,
+            'location': {
+                'value': self.location,
+                'latitude': self.latitude,
+                'longitude': self.longitude,
+            },
+            'rrule': self.rrule().to_ical().decode() if self.rrule() else None,
+            'start': datetime.datetime.combine(self.start_date, self.start_time),
+            'end': datetime.datetime.combine(self.end_date or self.start_date,
+                                             self.end_date or self.start_time)
+                                            if self.end_date or self.end_time
+                                            else None
+        }
+
     def to_ical(self) -> icalendar.Event:
         event = icalendar.Event()
         event.add('uid', self.group_id)

@@ -1,5 +1,16 @@
 # Created by https://www.gitignore.io
 
+.env
+
+rainbow/web/bower_components/
+rainbow/web/node_modules/
+rainbow/web/static/.webassets-cache/
+rainbow/web/static/*/*.min.*
+rainbow/web/static/css/min/
+rainbow/web/static/js/min/
+
+node_modules/
+
 ### PyCharm ###
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm
 
